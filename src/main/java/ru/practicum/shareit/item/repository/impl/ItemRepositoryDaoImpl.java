@@ -11,9 +11,9 @@ import java.util.concurrent.atomic.AtomicLong;
 @Repository
 public class ItemRepositoryDaoImpl implements ItemRepository {
 
-    private AtomicLong idGenerator = new AtomicLong(0);
+    private final AtomicLong idGenerator = new AtomicLong(0);
 
-    private Map<Long, Item> items = new HashMap<>();
+    private final Map<Long, Item> items = new HashMap<>();
 
     @Override
     public Item saveItem(Item item) {
@@ -33,21 +33,7 @@ public class ItemRepositoryDaoImpl implements ItemRepository {
     @Override
     public Item updateItem(Long id, Item item) {
         Item result = items.get(id);
-        if (result != null) {
-            if (item.getName() != null) {
-                result.setName(item.getName());
-            }
-            if (item.getDescription() != null) {
-                result.setDescription(item.getDescription());
-            }
-            if (item.getAvailable() != null) {
-                result.setAvailable(item.getAvailable());
-            }
-            items.put(id, result);
-            return result;
-        } else {
-            throw new EntityNotFoundException("Item not exist");
-        }
+        return getItem(id, item, result);
     }
 
     @Override
@@ -75,5 +61,23 @@ public class ItemRepositoryDaoImpl implements ItemRepository {
             }
         }
         return result;
+    }
+
+    private Item getItem(Long id, Item item, Item result) {
+        if (result != null) {
+            if (item.getName() != null) {
+                result.setName(item.getName());
+            }
+            if (item.getDescription() != null) {
+                result.setDescription(item.getDescription());
+            }
+            if (item.getAvailable() != null) {
+                result.setAvailable(item.getAvailable());
+            }
+            items.put(id, result);
+            return result;
+        } else {
+            throw new EntityNotFoundException("Item not exist");
+        }
     }
 }

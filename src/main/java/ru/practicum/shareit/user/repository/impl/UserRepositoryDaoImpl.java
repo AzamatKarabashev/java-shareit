@@ -11,9 +11,9 @@ import java.util.concurrent.atomic.AtomicLong;
 @Repository
 public class UserRepositoryDaoImpl implements UserRepository {
 
-    private AtomicLong idGenerator = new AtomicLong(0);
+    private final AtomicLong idGenerator = new AtomicLong(0);
 
-    private Map<Long, User> users = new HashMap<>();
+    private final Map<Long, User> users = new HashMap<>();
 
     @Override
     public Boolean isEmailAlreadyExist(String email) {
@@ -46,18 +46,7 @@ public class UserRepositoryDaoImpl implements UserRepository {
     @Override
     public User updateUser(Long id, User user) {
         User result = users.get(id);
-        if (result != null) {
-            if (user.getName() != null) {
-                result.setName(user.getName());
-            }
-            if (user.getEmail() != null) {
-                result.setEmail(user.getEmail());
-            }
-            users.put(id, result);
-            return result;
-        } else {
-            throw new EntityNotFoundException("User not exist");
-        }
+        return getUser(id, user, result);
     }
 
     @Override
@@ -72,5 +61,20 @@ public class UserRepositoryDaoImpl implements UserRepository {
     @Override
     public List<User> getAllUsers() {
         return new ArrayList<>(users.values());
+    }
+
+    private User getUser(Long id, User user, User result) {
+        if (result != null) {
+            if (user.getName() != null) {
+                result.setName(user.getName());
+            }
+            if (user.getEmail() != null) {
+                result.setEmail(user.getEmail());
+            }
+            users.put(id, result);
+            return result;
+        } else {
+            throw new EntityNotFoundException("User not exist");
+        }
     }
 }
