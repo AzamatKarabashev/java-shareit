@@ -3,7 +3,7 @@ package ru.practicum.shareit.item.service.impl;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import ru.practicum.shareit.exception.EntityNotFoundException;
+import ru.practicum.shareit.exception.CustomEntityNotFoundException;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.mapper.ItemMapper;
 import ru.practicum.shareit.item.model.Item;
@@ -29,7 +29,7 @@ public class ItemServiceImpl implements ItemService {
     public ItemDto saveItem(Long id, ItemDto itemDto) {
         log.debug("saveItem method called in Service to save");
         if (userRepository.getById(id).isEmpty()) {
-            throw new EntityNotFoundException("Owner not exist");
+            throw new CustomEntityNotFoundException("Owner not exist");
         }
         Item item = toItem(itemDto);
         item.setOwner(userRepository.getById(id).get());
@@ -40,11 +40,11 @@ public class ItemServiceImpl implements ItemService {
     @Override
     public ItemDto updateItem(Long id, Long itemId, ItemDto itemDto) {
         log.debug("updateItem method was called in Service to update");
-        userRepository.getById(id).orElseThrow(() -> new EntityNotFoundException("Owner not exist"));
+        userRepository.getById(id).orElseThrow(() -> new CustomEntityNotFoundException("Owner not exist"));
         Item itemToUpdate = itemRepository.getById(itemId)
-                .orElseThrow(() -> new EntityNotFoundException("Item not exist"));
+                .orElseThrow(() -> new CustomEntityNotFoundException("Item not exist"));
         if (!itemToUpdate.getOwner().getId().equals(id)) {
-            throw new EntityNotFoundException("Owner not exist");
+            throw new CustomEntityNotFoundException("Owner not exist");
         }
         itemToUpdate = toItem(itemDto);
         Item updatedItem = itemRepository.updateItem(itemId, itemToUpdate);
@@ -55,9 +55,9 @@ public class ItemServiceImpl implements ItemService {
     public ItemDto getById(Long id, Long itemId) {
         log.debug("getById method was called in Service to get item");
         userRepository.getById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Owner not exist"));
+                .orElseThrow(() -> new CustomEntityNotFoundException("Owner not exist"));
         Item itemToReceive = itemRepository.getById(itemId)
-                .orElseThrow(() -> new EntityNotFoundException("Item not exist"));
+                .orElseThrow(() -> new CustomEntityNotFoundException("Item not exist"));
         return toItemDto(itemToReceive);
     }
 

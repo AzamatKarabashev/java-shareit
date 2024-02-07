@@ -1,7 +1,7 @@
 package ru.practicum.shareit.item.repository.impl;
 
 import org.springframework.stereotype.Repository;
-import ru.practicum.shareit.exception.EntityNotFoundException;
+import ru.practicum.shareit.exception.CustomEntityNotFoundException;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.repository.api.ItemRepository;
 
@@ -77,7 +77,7 @@ public class ItemRepositoryDaoImpl implements ItemRepository {
             items.put(id, result);
             return result;
         } else {
-            throw new EntityNotFoundException("Item not exist");
+            throw new CustomEntityNotFoundException("Item not exist");
         }
     }
 }

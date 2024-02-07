@@ -1,7 +1,7 @@
 package ru.practicum.shareit.user.repository.impl;
 
 import org.springframework.stereotype.Repository;
-import ru.practicum.shareit.exception.EntityNotFoundException;
+import ru.practicum.shareit.exception.CustomEntityNotFoundException;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.repository.api.UserRepository;
 
@@ -17,15 +17,8 @@ public class UserRepositoryDaoImpl implements UserRepository {
 
     @Override
     public Boolean isEmailAlreadyExist(String email) {
-        if (email == null) {
-            return false;
-        }
-        for (User value : users.values()) {
-            if (email.equals(value.getEmail())) {
-                return true;
-            }
-        }
-        return false;
+        return email != null && !email.isEmpty() && users.values().stream()
+                .anyMatch(user -> email.equals(user.getEmail()));
     }
 
     @Override
@@ -54,7 +47,7 @@ public class UserRepositoryDaoImpl implements UserRepository {
         try {
             users.remove(id);
         } catch (RuntimeException e) {
-            throw new EntityNotFoundException("cant delete user cause user not exist");
+            throw new CustomEntityNotFoundException("cant delete user cause user not exist");
         }
     }
 
@@ -74,7 +67,7 @@ public class UserRepositoryDaoImpl implements UserRepository {
             users.put(id, result);
             return result;
         } else {
-            throw new EntityNotFoundException("User not exist");
+            throw new CustomEntityNotFoundException("User not exist");
         }
     }
 }

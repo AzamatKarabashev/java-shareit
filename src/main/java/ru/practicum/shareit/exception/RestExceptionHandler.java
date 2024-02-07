@@ -15,13 +15,13 @@ public class RestExceptionHandler {
 
     @ExceptionHandler
     @ResponseStatus(HttpStatus.NOT_FOUND)
-    public ResponseErrorDto handleNotFoundException(final EntityNotFoundException e) {
+    public ResponseErrorDto handleNotFoundException(final CustomEntityNotFoundException e) {
         log.warn("Entity not found: {}", e.getMessage());
         return new ResponseErrorDto("Entity not found", e.getMessage());
     }
 
     @ExceptionHandler({
-            BadRequestException.class,
+            CustomBadRequestException.class,
             ConstraintViolationException.class,
             ConversionFailedException.class
     })
