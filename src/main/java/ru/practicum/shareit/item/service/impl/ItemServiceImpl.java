@@ -78,7 +78,6 @@ public class ItemServiceImpl implements ItemService {
         if (Objects.equals(item.getOwner().getId(), user.getId())) {
             ItemDto itemWithBookings = getItemWithBookings(itemId);
             itemWithBookings.setComments(comments);
-            System.out.println("СУЧКАффффффффффффффВВВВВВВВВВВВВВВВВВВВВВВВ");
             return itemWithBookings;
         }
         ItemDto itemDto = toItemDto(item);
@@ -104,8 +103,7 @@ public class ItemServiceImpl implements ItemService {
                             this::toBookingItemDto,
                             (existing, replacement) -> existing
                     ));
-            List<Comment> comments = commentRepository.findByAuthorId(id);
-            List<CommentDto> commentDtos = comments.stream()
+            List<CommentDto> comments = commentRepository.findByAuthorId(id).stream()
                     .map(CommentMapper::toCommentDto)
                     .collect(Collectors.toList());
             return items.stream()
@@ -116,7 +114,7 @@ public class ItemServiceImpl implements ItemService {
                             .available(item.getAvailable())
                             .lastBooking(lastBookingsMap.get(item.getId()))
                             .nextBooking(nextBookingsMap.get(item.getId()))
-                            .comments(commentDtos)
+                            .comments(comments)
                             .build())
                     .collect(Collectors.toList());
         }
