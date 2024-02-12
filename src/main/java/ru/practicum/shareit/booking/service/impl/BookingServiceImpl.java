@@ -16,6 +16,7 @@ import ru.practicum.shareit.item.repository.api.ItemRepository;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.repository.api.UserRepository;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
 
@@ -31,6 +32,7 @@ public class BookingServiceImpl implements BookingService {
 
     @Override
     public BookingResponseDto saveBooking(Long bookerId, BookingRequestDto requestDto) {
+        bookingTimeValidation(requestDto);
         User booker = userRepository.findById(bookerId)
                 .orElseThrow((() -> new CustomEntityNotFoundException("User not exists")));
         Item item = itemRepository.findById(requestDto.getItemId())
@@ -130,6 +132,18 @@ public class BookingServiceImpl implements BookingService {
                 return toBookingResponseDtoList(bookingRepository.findRejectedBookingsByOwnerId(ownerId));
             default:
                 throw new IllegalStateException("Unknown state: " + state);
+        }
+    }
+
+    private static void bookingTimeValidation(BookingRequestDto requestDto) {
+        if (requestDto.getStart().isBefore(LocalDateTime.now())) {
+            throw new CustomBadRequestException("Start time must be in future");
+        }
+        if (requestDto.getStart().equals(requestDto.getEnd())) {
+            throw new CustomBadRequestException("Start time must be equal end time");
+        }
+        if (requestDto.getStart().isAfter(requestDto.getEnd())) {
+            throw new CustomBadRequestException("Start time must be before end time");
         }
     }
 }

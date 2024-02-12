@@ -26,7 +26,6 @@ public class BookingController {
     public BookingResponseDto saveBooking(@RequestHeader(USER_ID) Long bookerId,
                                           @Valid @RequestBody BookingRequestDto requestDto) {
         log.debug("POST request in booking controller with booker id={}", bookerId);
-        bookingTimeValidation(requestDto);
         return service.saveBooking(bookerId, requestDto);
     }
 
@@ -57,17 +56,5 @@ public class BookingController {
                                                         @RequestParam(required = false, defaultValue = "ALL") String state) {
         log.debug("GET request received in booking controller to give list of booking by given owner id={}", ownerId);
         return service.getBookingByOwnerId(ownerId, state);
-    }
-
-    private static void bookingTimeValidation(BookingRequestDto requestDto) {
-        if (requestDto.getStart().isBefore(LocalDateTime.now())) {
-            throw new CustomBadRequestException("Start time must be in future");
-        }
-        if (requestDto.getStart().equals(requestDto.getEnd())) {
-            throw new CustomBadRequestException("Start time must be equal end time");
-        }
-        if (requestDto.getStart().isAfter(requestDto.getEnd())) {
-            throw new CustomBadRequestException("Start time must be before end time");
-        }
     }
 }
