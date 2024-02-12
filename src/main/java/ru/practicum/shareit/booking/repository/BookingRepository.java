@@ -73,21 +73,15 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
     @Query("SELECT b FROM Booking b WHERE b.item.owner.id = :ownerId AND b.status = 'REJECTED' ORDER BY b.start DESC")
     List<Booking> findRejectedBookingsByOwnerId(@Param("ownerId") Long ownerId);
 
-    // Для предметов по которым осуществляли заказы (одна сущность)
-    @EntityGraph(attributePaths = {"item", "booker"})
-    @Query("SELECT b FROM Booking b WHERE b.item.id = :itemId ")
-    Booking findBookingByItemId(@Param("itemId") Long itemId);
-
-    // Для предметов по котрым осуществляли заказы (список)
-    @EntityGraph(attributePaths = {"item", "booker"})
-    @Query("SELECT b FROM Booking b WHERE b.item.id = :itemId ")
-    List<Booking> findListOfBookingByItemId(@Param("itemId") Long itemId);
-
     // Метод для получения следующего будущего бронирования для вещи
-    @Query("SELECT b FROM Booking b WHERE b.item.id = :itemId AND b.end < CURRENT_TIMESTAMP ORDER BY b.end DESC")
+    @Query("SELECT b FROM Booking b WHERE b.item.id = :itemId " +
+            "AND b.start < CURRENT_TIMESTAMP " +
+            "AND NOT b.status = 'REJECTED' ORDER BY b.end DESC")
     List<Booking> findPastBookingsByItemId(@Param("itemId") Long itemId);
 
-    @Query("SELECT b FROM Booking b WHERE b.item.id = :itemId AND b.start > CURRENT_TIMESTAMP ORDER BY b.start ASC")
+    @Query("SELECT b FROM Booking b WHERE b.item.id = :itemId " +
+            "AND b.start > CURRENT_TIMESTAMP " +
+            "AND NOT b.status = 'REJECTED' ORDER BY b.start ASC")
     List<Booking> findFutureBookingsByItemId(@Param("itemId") Long itemId);
 
     // Оптимизированные методы для получения новых списков List<Item> с учетом last и next

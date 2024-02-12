@@ -72,22 +72,17 @@ public class ItemServiceImpl implements ItemService {
                 .orElseThrow(() -> new CustomEntityNotFoundException("Owner not exist"));
         Item item = itemRepository.findById(itemId)
                 .orElseThrow(() -> new CustomEntityNotFoundException("Item not exist"));
-        List<Comment> comments = commentRepository.findByItemId(itemId);
-        List<CommentDto> commentDtos = comments.stream()
+        List<CommentDto> comments = commentRepository.findByItemId(itemId).stream()
                 .map(CommentMapper::toCommentDto)
                 .collect(Collectors.toList());
-        if (user.getId() == 6 && item.getId() == 4) {
-            ItemDto specificItem = getItemWithBookings(4L);
-            specificItem.setLastBooking(new BookingItemDto(8L, 1L));
-            return specificItem;
-        }
         if (Objects.equals(item.getOwner().getId(), user.getId())) {
             ItemDto itemWithBookings = getItemWithBookings(itemId);
-            itemWithBookings.setComments(commentDtos);
+            itemWithBookings.setComments(comments);
+            System.out.println("СУЧКАффффффффффффффВВВВВВВВВВВВВВВВВВВВВВВВ");
             return itemWithBookings;
         }
         ItemDto itemDto = toItemDto(item);
-        itemDto.setComments(commentDtos);
+        itemDto.setComments(comments);
         return itemDto;
     }
 
@@ -158,36 +153,32 @@ public class ItemServiceImpl implements ItemService {
 
     private ItemDto getItemWithBookings(Long itemId) {
         Item item = itemRepository.findById(itemId).orElseThrow(() -> new CustomEntityNotFoundException("Item not found"));
-        BookingItemDto lastBookingDto = bookingRepository.findPastBookingsByItemId(itemId)
-                .stream()
-                .map(this::toBookingItemDto)
-                .findFirst()
-                .orElse(null);
-        BookingItemDto nextBookingDto = bookingRepository.findFutureBookingsByItemId(itemId)
-                .stream()
-                .map(this::toBookingItemDto)
-                .findFirst()
-                .orElse(null);
-
-        if (lastBookingDto != null && nextBookingDto != null) {
-            ItemDto build = ItemDto.builder()
-                    .id(item.getId())
-                    .name(item.getName())
-                    .description(item.getDescription())
-                    .available(item.getAvailable())
-                    .lastBooking(lastBookingDto)
-                    .nextBooking(nextBookingDto)
-                    .build();
-            return build;
-        }
+        BookingItemDto lastBookingDto = findPastBookingsByItemId(itemId);
+        BookingItemDto nextBookingDto = findFutureBookingsByItemId(itemId);
         return ItemDto.builder()
                 .id(item.getId())
                 .name(item.getName())
                 .description(item.getDescription())
                 .available(item.getAvailable())
-                .lastBooking(null)
-                .nextBooking(null)
+                .lastBooking(lastBookingDto)
+                .nextBooking(nextBookingDto)
                 .build();
+    }
+
+    private BookingItemDto findFutureBookingsByItemId(Long itemId) {
+        return bookingRepository.findFutureBookingsByItemId(itemId)
+                .stream()
+                .map(this::toBookingItemDto)
+                .findFirst()
+                .orElse(null);
+    }
+
+    private BookingItemDto findPastBookingsByItemId(Long itemId) {
+        return bookingRepository.findPastBookingsByItemId(itemId)
+                .stream()
+                .map(this::toBookingItemDto)
+                .findFirst()
+                .orElse(null);
     }
 
     private BookingItemDto toBookingItemDto(Booking booking) {
