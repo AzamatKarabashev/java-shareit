@@ -3,6 +3,8 @@ package ru.practicum.shareit.user.mapper;
 import ru.practicum.shareit.user.dto.UserDto;
 import ru.practicum.shareit.user.model.User;
 
+import java.util.Optional;
+
 public class UserMapper {
     public static UserDto toUserDto(User user) {
         return UserDto.builder()
@@ -18,5 +20,11 @@ public class UserMapper {
                 .name(userDto.getName())
                 .email(userDto.getEmail())
                 .build();
+    }
+
+    public static User updateUserByGivenDto(User user, UserDto userDto) {
+        Optional.ofNullable(userDto.getName()).ifPresent(user::setName);
+        Optional.ofNullable(userDto.getEmail()).ifPresent(user::setEmail);
+        return user;
     }
 }

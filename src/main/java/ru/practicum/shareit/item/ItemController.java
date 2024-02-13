@@ -4,10 +4,12 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import ru.practicum.shareit.item.dto.CommentDto;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.service.api.ItemService;
 import ru.practicum.shareit.validation.OnCreate;
 
+import javax.validation.Valid;
 import java.util.Collections;
 import java.util.List;
 
@@ -57,5 +59,12 @@ public class ItemController {
             return Collections.emptyList();
         }
         return service.searchByText(text);
+    }
+
+    @PostMapping("/{itemId}/comment")
+    public CommentDto saveComment(@PathVariable Long itemId,
+                                  @RequestHeader(OWNER_ID) Long userId,
+                                  @Valid @RequestBody CommentDto commentDto) {
+        return service.saveComment(itemId, userId, commentDto);
     }
 }
