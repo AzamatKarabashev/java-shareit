@@ -135,7 +135,7 @@ public class BookingServiceImpl implements BookingService {
         }
     }
 
-    private static void bookingTimeValidation(BookingRequestDto requestDto) {
+    private void bookingTimeValidation(BookingRequestDto requestDto) {
         if (requestDto.getStart().isBefore(LocalDateTime.now())) {
             throw new CustomBadRequestException("Start time must be in future");
         }
