@@ -3,8 +3,8 @@ package ru.practicum.shareit.item.service.impl;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import ru.practicum.shareit.booking.Booking;
 import ru.practicum.shareit.booking.dto.BookingItemDto;
+import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.booking.repository.BookingRepository;
 import ru.practicum.shareit.exception.CustomBadRequestException;
 import ru.practicum.shareit.exception.CustomEntityNotFoundException;
@@ -21,14 +21,11 @@ import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.repository.api.UserRepository;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
-
-import static ru.practicum.shareit.item.mapper.CommentMapper.toComment;
-import static ru.practicum.shareit.item.mapper.CommentMapper.toCommentDto;
-import static ru.practicum.shareit.item.mapper.ItemMapper.*;
 
 @Slf4j
 @Service
@@ -43,11 +40,16 @@ public class ItemServiceImpl implements ItemService {
     @Override
     public ItemDto saveItem(Long id, ItemDto itemDto) {
         log.debug("saveItem method called in Service to save");
-        userRepository.findById(id).orElseThrow(() -> new CustomEntityNotFoundException("Owner not exist"));
-        Item item = toItem(itemDto);
-        item.setOwner(userRepository.getReferenceById(id));
+        User owner = userRepository.findById(id)
+                .orElseThrow(() -> new CustomEntityNotFoundException("Owner not exist"));
+        Item item = ItemMapper.INSTANCE.toItem(itemDto);
+        item.setOwner(owner);
+        Long requestId = item.getRequestId();
+        if (requestId != null) {
+            item.setRequestId(requestId);
+        }
         item = itemRepository.save(item);
-        return toItemDto(item);
+        return ItemMapper.INSTANCE.toItemDto(item);
     }
 
     @Override
@@ -60,9 +62,9 @@ public class ItemServiceImpl implements ItemService {
         if (!existItem.getOwner().getId().equals(existOwner.getId())) {
             throw new CustomEntityNotFoundException("Owner not exist");
         }
-        Item save = updateItemByGivenDto(existItem, itemDto);
+        Item save = ItemMapper.INSTANCE.updateItemByGivenDto(itemDto, existItem);
         Item result = itemRepository.save(save);
-        return toItemDto(result);
+        return ItemMapper.INSTANCE.toItemDto(result);
     }
 
     @Override
@@ -73,14 +75,14 @@ public class ItemServiceImpl implements ItemService {
         Item item = itemRepository.findById(itemId)
                 .orElseThrow(() -> new CustomEntityNotFoundException("Item not exist"));
         List<CommentDto> comments = commentRepository.findByItemId(itemId).stream()
-                .map(CommentMapper::toCommentDto)
+                .map(CommentMapper.INSTANCE::toCommentDto)
                 .collect(Collectors.toList());
         if (Objects.equals(item.getOwner().getId(), user.getId())) {
             ItemDto itemWithBookings = getItemWithBookings(itemId);
             itemWithBookings.setComments(comments);
             return itemWithBookings;
         }
-        ItemDto itemDto = toItemDto(item);
+        ItemDto itemDto = ItemMapper.INSTANCE.toItemDto(item);
         itemDto.setComments(comments);
         return itemDto;
     }
@@ -90,7 +92,7 @@ public class ItemServiceImpl implements ItemService {
         List<Item> items = itemRepository.getItemsByOwnerId(id);
         List<Booking> lastBookings = bookingRepository.findLastBookingsForOwnerItems(id);
         List<Booking> nextBookings = bookingRepository.findNextBookingsForOwnerItems(id);
-        if (id != null && userRepository.findById(id).isPresent()) {
+        if (id != null) {
             Map<Long, BookingItemDto> lastBookingsMap = lastBookings.stream()
                     .collect(Collectors.toMap(
                             booking -> booking.getItem().getId(),
@@ -104,7 +106,7 @@ public class ItemServiceImpl implements ItemService {
                             (existing, replacement) -> existing
                     ));
             List<CommentDto> comments = commentRepository.findByAuthorId(id).stream()
-                    .map(CommentMapper::toCommentDto)
+                    .map(CommentMapper.INSTANCE::toCommentDto)
                     .collect(Collectors.toList());
             return items.stream()
                     .map(item -> ItemDto.builder()
@@ -118,16 +120,14 @@ public class ItemServiceImpl implements ItemService {
                             .build())
                     .collect(Collectors.toList());
         }
-        return itemRepository.findAll().stream()
-                .map(ItemMapper::toItemDto)
-                .collect(Collectors.toList());
+        return new ArrayList<>();
     }
 
     @Override
     public List<ItemDto> searchByText(String text) {
         return itemRepository.search(text).stream()
                 .filter(Item::getAvailable)
-                .map(ItemMapper::toItemDto)
+                .map(ItemMapper.INSTANCE::toItemDto)
                 .collect(Collectors.toList());
     }
 
@@ -141,12 +141,12 @@ public class ItemServiceImpl implements ItemService {
         if (finishedBookings.isEmpty()) {
             throw new CustomBadRequestException("User cant comment this item, cause booking isn't done already");
         }
-        Comment comment = toComment(commentDto);
+        Comment comment = CommentMapper.INSTANCE.toComment(commentDto);
         comment.setItem(item);
         comment.setAuthor(user);
         comment.setCreated(LocalDateTime.now());
         Comment savedComment = commentRepository.save(comment);
-        return toCommentDto(commentRepository.save(savedComment));
+        return CommentMapper.INSTANCE.toCommentDto(savedComment);
     }
 
     private ItemDto getItemWithBookings(Long itemId) {

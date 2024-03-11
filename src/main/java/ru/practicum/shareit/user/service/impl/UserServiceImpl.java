@@ -13,8 +13,6 @@ import ru.practicum.shareit.user.service.api.UserService;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static ru.practicum.shareit.user.mapper.UserMapper.*;
-
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -24,24 +22,24 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserDto saveUser(UserDto userDto) {
-        User user = toUser(userDto);
+        User user = UserMapper.INSTANCE.toUser(userDto);
         user = repository.save(user);
-        return toUserDto(user);
+        return UserMapper.INSTANCE.toUserDto(user);
     }
 
     @Override
     public UserDto updateUser(Long userId, UserDto userDto) {
         log.debug("updateUser method in service was called");
         User existUser = repository.findById(userId).orElseThrow(() -> new CustomEntityNotFoundException("User not exist"));
-        User result = updateUserByGivenDto(existUser, userDto);
+        User result = UserMapper.INSTANCE.updateUserByGivenDto(userDto, existUser);
         User save = repository.save(result);
-        return toUserDto(save);
+        return UserMapper.INSTANCE.toUserDto(save);
     }
 
     @Override
     public UserDto getUserById(Long id) {
         log.debug("getUserById method was called in service");
-        return toUserDto(repository.findById(id).orElseThrow(() -> new CustomEntityNotFoundException("User not exist")));
+        return UserMapper.INSTANCE.toUserDto(repository.findById(id).orElseThrow(() -> new CustomEntityNotFoundException("User not exist")));
     }
 
     @Override
@@ -53,7 +51,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public List<UserDto> getAllUsers() {
         return repository.findAll().stream()
-                .map(UserMapper::toUserDto)
+                .map(UserMapper.INSTANCE::toUserDto)
                 .collect(Collectors.toList());
     }
 }
