@@ -57,7 +57,6 @@ class BookingControllerTest {
                 .start(requestDto.getStart())
                 .end(requestDto.getEnd())
                 .build();
-
         when(bookingService.saveBooking(eq(1L), any(BookingRequestDto.class))).thenReturn(responseDto);
 
         String jsonFromDto = mapper.writeValueAsString(requestDto);
@@ -77,7 +76,6 @@ class BookingControllerTest {
                 .start(LocalDateTime.now().plusDays(1))
                 .end(LocalDateTime.now().plusDays(2))
                 .build();
-
         when(bookingService.updateBooking(eq(1L), eq(1L), eq(true))).thenReturn(responseDto);
 
         mockMvc.perform(patch("/bookings/1")
@@ -94,7 +92,6 @@ class BookingControllerTest {
                 .start(LocalDateTime.now().plusDays(1))
                 .end(LocalDateTime.now().plusDays(2))
                 .build();
-
         when(bookingService.getBookingByBookingId(eq(1L), eq(1L))).thenReturn(responseDto);
 
         mockMvc.perform(get("/bookings/1")

@@ -40,7 +40,6 @@ public class UserControllerTest {
     void testSaveUserWhenValidUserThenReturnSavedUser() throws Exception {
         UserDto userDto = UserDto.builder().name("Test User").email("test@example.com").build();
         UserDto savedUserDto = UserDto.builder().id(1L).name("Test User").email("test@example.com").build();
-
         when(service.saveUser(any(UserDto.class))).thenReturn(savedUserDto);
 
         mockMvc.perform(post("/users")
@@ -57,7 +56,6 @@ public class UserControllerTest {
         Long userId = 1L;
         UserDto userDto = UserDto.builder().name("Updated User").email("updated@example.com").build();
         UserDto updatedUserDto = UserDto.builder().id(userId).name("Updated User").email("updated@example.com").build();
-
         when(service.updateUser(eq(userId), any(UserDto.class))).thenReturn(updatedUserDto);
 
         mockMvc.perform(patch("/users/{id}", userId)
@@ -73,7 +71,6 @@ public class UserControllerTest {
     void testGetUserByIdWhenValidIdThenReturnUser() throws Exception {
         Long userId = 1L;
         UserDto userDto = UserDto.builder().id(userId).name("Test User").email("test@example.com").build();
-
         when(service.getUserById(userId)).thenReturn(userDto);
 
         mockMvc.perform(get("/users/{id}", userId))
@@ -101,7 +98,6 @@ public class UserControllerTest {
                 UserDto.builder().id(1L).name("Test User 1").email("user1@example.com").build(),
                 UserDto.builder().id(2L).name("Test User 2").email("user2@example.com").build()
         );
-
         when(service.getAllUsers()).thenReturn(users);
 
         mockMvc.perform(get("/users"))

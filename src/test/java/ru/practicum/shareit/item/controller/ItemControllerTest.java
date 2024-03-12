@@ -67,7 +67,6 @@ class ItemControllerTest {
                 .comments(dto.getComments())
                 .requestId(dto.getRequestId())
                 .build();
-
         String jsonFromDto = mapper.writeValueAsString(dto);
 
         when(itemService.saveItem(eq(1L), any(ItemDto.class))).thenReturn(responseDto);
@@ -88,7 +87,6 @@ class ItemControllerTest {
                 .description("Описание обновленного предмета")
                 .available(true)
                 .build();
-
         String itemDtoJson = mapper.writeValueAsString(itemDto);
 
         when(itemService.updateItem(eq(1L), eq(1L), any(ItemDto.class))).thenReturn(itemDto);
@@ -112,7 +110,6 @@ class ItemControllerTest {
                 .description("Описание найденного предмета")
                 .available(true)
                 .build();
-
         when(itemService.getById(1L, 1L)).thenReturn(itemDto);
 
         mockMvc.perform(get("/items/1")
@@ -140,7 +137,6 @@ class ItemControllerTest {
                         .available(false)
                         .build()
         );
-
         when(itemService.getAllItems(1L)).thenReturn(items);
 
         mockMvc.perform(get("/items")
@@ -173,7 +169,6 @@ class ItemControllerTest {
                         .available(false)
                         .build()
         );
-
         when(itemService.searchByText("text")).thenReturn(items);
 
         mockMvc.perform(get("/items/search")
@@ -212,14 +207,12 @@ class ItemControllerTest {
         CommentDto commentDto = CommentDto.builder()
                 .text("Отличный предмет")
                 .build();
-
         CommentDto responseDto = CommentDto.builder()
                 .id(1L)
                 .text(commentDto.getText())
                 .authorName("Иван Иванов")
                 .created(LocalDateTime.now())
                 .build();
-
         String commentDtoJson = mapper.writeValueAsString(commentDto);
 
         when(itemService.saveComment(eq(1L), eq(1L), any(CommentDto.class))).thenReturn(responseDto);
