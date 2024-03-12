@@ -1,4 +1,4 @@
-package ru.practicum.shareit.item;
+package ru.practicum.shareit.item.controller;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -20,19 +20,19 @@ import java.util.List;
 @RequestMapping("/items")
 public class ItemController {
 
-    public static final String OWNER_ID = "X-Sharer-User-Id";
+    public static final String USER_ID = "X-Sharer-User-Id";
 
     private final ItemService service;
 
     @PostMapping
-    public ItemDto saveItem(@RequestHeader(OWNER_ID) Long id,
+    public ItemDto saveItem(@RequestHeader(USER_ID) Long id,
                             @Validated(OnCreate.class) @RequestBody ItemDto itemDto) {
         log.debug("POST request received to save item");
         return service.saveItem(id, itemDto);
     }
 
     @PatchMapping("{itemId}")
-    public ItemDto updateItem(@RequestHeader(OWNER_ID) Long id,
+    public ItemDto updateItem(@RequestHeader(USER_ID) Long id,
                               @PathVariable Long itemId,
                               @RequestBody ItemDto itemDto) {
         log.debug("PATCH request received to update item with id={}", itemId);
@@ -40,14 +40,14 @@ public class ItemController {
     }
 
     @GetMapping("{itemId}")
-    public ItemDto getById(@RequestHeader(OWNER_ID) Long id,
+    public ItemDto getById(@RequestHeader(USER_ID) Long id,
                            @PathVariable Long itemId) {
         log.debug("GET request received to get item by id={}", itemId);
         return service.getById(id, itemId);
     }
 
     @GetMapping
-    public List<ItemDto> getAllItems(@RequestHeader(OWNER_ID) Long id) {
+    public List<ItemDto> getAllItems(@RequestHeader(USER_ID) Long id) {
         log.debug("GET request received to get list of items");
         return service.getAllItems(id);
     }
@@ -63,7 +63,7 @@ public class ItemController {
 
     @PostMapping("/{itemId}/comment")
     public CommentDto saveComment(@PathVariable Long itemId,
-                                  @RequestHeader(OWNER_ID) Long userId,
+                                  @RequestHeader(USER_ID) Long userId,
                                   @Valid @RequestBody CommentDto commentDto) {
         return service.saveComment(itemId, userId, commentDto);
     }

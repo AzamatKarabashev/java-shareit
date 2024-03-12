@@ -25,11 +25,11 @@ public class Comment {
     private String text;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "item_id")
+    @JoinColumn(name = "item_id", referencedColumnName = "id")
     private Item item;
 
     @ManyToOne(fetch = FetchType.EAGER, optional = false)
-    @JoinColumn(name = "author_id")
+    @JoinColumn(name = "author_id", referencedColumnName = "id")
     private User author;
     private LocalDateTime created;
 }

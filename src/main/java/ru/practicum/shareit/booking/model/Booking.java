@@ -1,4 +1,4 @@
-package ru.practicum.shareit.booking;
+package ru.practicum.shareit.booking.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -30,11 +30,11 @@ public class Booking {
     private LocalDateTime end;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "item_id")
+    @JoinColumn(name = "item_id", referencedColumnName = "id")
     private Item item;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "booker_id")
+    @JoinColumn(name = "booker_id", referencedColumnName = "id")
     private User booker;
 
     @Enumerated(EnumType.STRING)

@@ -1,30 +1,27 @@
 package ru.practicum.shareit.item.mapper;
 
+import org.mapstruct.*;
+import org.mapstruct.factory.Mappers;
 import ru.practicum.shareit.item.dto.CommentDto;
 import ru.practicum.shareit.item.model.Comment;
 
 import java.time.LocalDateTime;
 
-public class CommentMapper {
+@Mapper(componentModel = "spring",
+        nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE,
+        builder = @Builder(disableBuilder = true))
+public interface CommentMapper {
 
-    public static Comment toComment(CommentDto commentDto) {
-        return Comment.builder()
-                .id(commentDto.getId())
-                .text(commentDto.getText())
-                .item(commentDto.getItem())
-                .author(commentDto.getAuthor())
-                .created(LocalDateTime.now())
-                .build();
+    CommentMapper INSTANCE = Mappers.getMapper(CommentMapper.class);
+
+    @Mapping(target = "created", ignore = true)
+    Comment toComment(CommentDto source);
+
+    @AfterMapping
+    default void setCreatedTime(@MappingTarget Comment comment) {
+        comment.setCreated(LocalDateTime.now());
     }
 
-    public static CommentDto toCommentDto(Comment comment) {
-        return CommentDto.builder()
-                .id(comment.getId())
-                .text(comment.getText())
-                .item(comment.getItem())
-                .author(comment.getAuthor())
-                .authorName(comment.getAuthor().getName())
-                .created(comment.getCreated())
-                .build();
-    }
+    @Mapping(target = "authorName", source = "author.name")
+    CommentDto toCommentDto(Comment source);
 }

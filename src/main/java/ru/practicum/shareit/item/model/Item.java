@@ -5,7 +5,6 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import ru.practicum.shareit.request.ItemRequest;
 import ru.practicum.shareit.user.model.User;
 
 import javax.persistence.*;
@@ -17,7 +16,6 @@ import javax.persistence.*;
 @NoArgsConstructor
 @AllArgsConstructor
 public class Item {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -33,10 +31,9 @@ public class Item {
 
     @JsonBackReference
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "owner_id")
+    @JoinColumn(name = "owner_id", referencedColumnName = "id")
     private User owner;
 
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "request_id", referencedColumnName = "id")
-    private ItemRequest request;
+    @Column(name = "request_id")
+    private Long requestId;
 }
