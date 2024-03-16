@@ -21,12 +21,14 @@ services:
       - db
     environment:
       - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/shareit
+      - SPRING_DATASOURCE_USERNAME=shareit
+      - SPRING_DATASOURCE_PASSWORD=shareit
 
   db:
     image: postgres:13
     container_name: db
     ports:
-      - "5432:5432"
+      - "6433:5432"
     environment:
       - POSTGRES_DB=shareit
       - POSTGRES_USER=shareit

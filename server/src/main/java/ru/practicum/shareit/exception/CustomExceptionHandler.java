@@ -3,13 +3,13 @@ package ru.practicum.shareit.exception;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.convert.ConversionFailedException;
 import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import javax.persistence.EntityNotFoundException;
 import javax.validation.ConstraintViolationException;
-import java.util.Map;
 
 @Slf4j
 @RestControllerAdvice
@@ -32,17 +32,20 @@ public class CustomExceptionHandler {
     @ExceptionHandler({
             CustomBadRequestException.class,
             ConstraintViolationException.class,
-            ConversionFailedException.class
+            ConversionFailedException.class,
+            IllegalStateException.class,
+            MethodArgumentNotValidException.class
     })
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ResponseErrorDto handleBadRequest(final RuntimeException e) {
         log.warn("Bad request received: {}", e.getMessage());
-        return new ResponseErrorDto("Bad request received", e.getMessage());
+        return new ResponseErrorDto(null, e.getMessage());
     }
 
-    @ExceptionHandler
+    @ExceptionHandler(Exception.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-    public Map<String, String> handlePostmanTest(final IllegalStateException e) {
-        return Map.of("error", e.getMessage());
+    public ResponseErrorDto handleGeneralException(final Exception e) {
+        log.error("An unexpected error message: {}", e.getMessage(), e);
+        return new ResponseErrorDto("Internal Server Error", "An unexpected error");
     }
 }

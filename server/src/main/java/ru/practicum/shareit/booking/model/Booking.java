@@ -17,6 +17,11 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @Builder
 @AllArgsConstructor
+@NamedEntityGraph(name = "Booking",
+        attributeNodes = {
+                @NamedAttributeNode("item"),
+                @NamedAttributeNode("booker")
+        })
 public class Booking {
 
     @Id

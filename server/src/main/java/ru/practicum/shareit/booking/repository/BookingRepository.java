@@ -17,67 +17,67 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
     Booking findBookingByIdWithItemAndBookerEagerly(Long id);
 
     // Для получения всех заказов пользователя
-    @EntityGraph(attributePaths = {"item", "booker"})
+    @EntityGraph(value = "Booking")
     @Query("SELECT b FROM Booking b WHERE b.booker.id = :userId ORDER BY b.start DESC")
     Page<Booking> findAllByGivenUserId(@Param("userId") Long userId, Pageable pageable);
 
     // Для состояния CURRENT (текущие бронирования)
-    @EntityGraph(attributePaths = {"item", "booker"})
+    @EntityGraph(value = "Booking")
     @Query("SELECT b FROM Booking b WHERE b.booker.id = :bookerId " +
             "AND b.start <= CURRENT_TIMESTAMP AND b.end > CURRENT_TIMESTAMP ORDER BY b.start DESC")
     Page<Booking> findCurrentBookingsByBookerId(@Param("bookerId") Long bookerId, Pageable pageable);
 
     // Для состояния PAST (прошедшие бронирования)
-    @EntityGraph(attributePaths = {"item", "booker"})
+    @EntityGraph(value = "Booking")
     @Query("SELECT b FROM Booking b WHERE b.booker.id = :bookerId " +
             "AND b.end < CURRENT_TIMESTAMP ORDER BY b.start DESC")
     Page<Booking> findPastBookingsByBookerId(@Param("bookerId") Long bookerId, Pageable pageable);
 
     // Для состояния FUTURE (будущие бронирования)
-    @EntityGraph(attributePaths = {"item", "booker"})
+    @EntityGraph(value = "Booking")
     @Query("SELECT b FROM Booking b WHERE b.booker.id = :bookerId " +
             "AND b.start > CURRENT_TIMESTAMP ORDER BY b.start DESC")
     Page<Booking> findFutureBookingsByBookerId(@Param("bookerId") Long bookerId, Pageable pageable);
 
     // Для состояния WAITING (бронирования, ожидающие подтверждения)
-    @EntityGraph(attributePaths = {"item", "booker"})
+    @EntityGraph(value = "Booking")
     @Query("SELECT b FROM Booking b WHERE b.booker.id = :bookerId " +
             "AND b.status = 'WAITING' ORDER BY b.start DESC")
     Page<Booking> findWaitingBookingsByBookerId(@Param("bookerId") Long bookerId, Pageable pageable);
 
     // Для состояния REJECTED (отклоненные бронирования)
-    @EntityGraph(attributePaths = {"item", "booker"})
+    @EntityGraph(value = "Booking")
     @Query("SELECT b FROM Booking b WHERE b.booker.id = :bookerId " +
             "AND b.status = 'REJECTED' ORDER BY b.start DESC")
     Page<Booking> findRejectedBookingsByBookerId(@Param("bookerId") Long bookerId, Pageable pageable);
 
     // Для состояния ALL (все бронирования) OWNER (ВЛАДЕЛЕЦ)
-    @EntityGraph(attributePaths = {"item", "booker"})
+    @EntityGraph(value = "Booking")
     @Query("SELECT b FROM Booking b WHERE b.item.owner.id = :ownerId ORDER BY b.start DESC")
     Page<Booking> findAllBookingsByOwnerId(@Param("ownerId") Long ownerId, Pageable pageable);
 
     // Для состояния CURRENT (текущие бронирования) OWNER (ВЛАДЕЛЕЦ)
-    @EntityGraph(attributePaths = {"item", "booker"})
+    @EntityGraph(value = "Booking")
     @Query("SELECT b FROM Booking b WHERE b.item.owner.id = :ownerId AND b.start <= CURRENT_TIMESTAMP AND b.end > CURRENT_TIMESTAMP ORDER BY b.start DESC")
     Page<Booking> findCurrentBookingsByOwnerId(@Param("ownerId") Long ownerId, Pageable pageable);
 
     // Для состояния PAST (прошедшие бронирования) OWNER (ВЛАДЕЛЕЦ)
-    @EntityGraph(attributePaths = {"item", "booker"})
+    @EntityGraph(value = "Booking")
     @Query("SELECT b FROM Booking b WHERE b.item.owner.id = :ownerId AND b.end < CURRENT_TIMESTAMP ORDER BY b.start DESC")
     Page<Booking> findPastBookingsByOwnerId(@Param("ownerId") Long ownerId, Pageable pageable);
 
     // Для состояния FUTURE (будущие бронирования) OWNER (ВЛАДЕЛЕЦ)
-    @EntityGraph(attributePaths = {"item", "booker"})
+    @EntityGraph(value = "Booking")
     @Query("SELECT b FROM Booking b WHERE b.item.owner.id = :ownerId AND b.start > CURRENT_TIMESTAMP ORDER BY b.start DESC")
     Page<Booking> findFutureBookingsByOwnerId(@Param("ownerId") Long ownerId, Pageable pageable);
 
     // Для состояния WAITING (бронирования, ожидающие подтверждения) OWNER (ВЛАДЕЛЕЦ)
-    @EntityGraph(attributePaths = {"item", "booker"})
+    @EntityGraph(value = "Booking")
     @Query("SELECT b FROM Booking b WHERE b.item.owner.id = :ownerId AND b.status = 'WAITING' ORDER BY b.start DESC")
     Page<Booking> findWaitingBookingsByOwnerId(@Param("ownerId") Long ownerId, Pageable pageable);
 
     // Для состояния REJECTED (отклоненные бронирования) OWNER (ВЛАДЕЛЕЦ)
-    @EntityGraph(attributePaths = {"item", "booker"})
+    @EntityGraph(value = "Booking")
     @Query("SELECT b FROM Booking b WHERE b.item.owner.id = :ownerId AND b.status = 'REJECTED' ORDER BY b.start DESC")
     Page<Booking> findRejectedBookingsByOwnerId(@Param("ownerId") Long ownerId, Pageable pageable);
 
@@ -93,16 +93,16 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
     List<Booking> findFutureBookingsByItemId(@Param("itemId") Long itemId);
 
     // Оптимизированные методы для получения новых списков List<Item> с учетом last и next
-    @EntityGraph(attributePaths = {"item", "booker"})
+    @EntityGraph(value = "Booking")
     @Query("SELECT b FROM Booking b WHERE b.item.owner.id = :ownerId AND b.end < CURRENT_TIMESTAMP ORDER BY b.end DESC")
     List<Booking> findLastBookingsForOwnerItems(@Param("ownerId") Long ownerId);
 
-    @EntityGraph(attributePaths = {"item", "booker"})
+    @EntityGraph(value = "Booking")
     @Query("SELECT b FROM Booking b WHERE b.item.owner.id = :ownerId AND b.start > CURRENT_TIMESTAMP ORDER BY b.start ASC")
     List<Booking> findNextBookingsForOwnerItems(@Param("ownerId") Long ownerId);
 
     // Имеет ли право на коммент юзер
-    @EntityGraph(attributePaths = {"item", "booker"})
+    @EntityGraph(value = "Booking")
     @Query("SELECT b FROM Booking b WHERE b.item.id = :itemId AND b.booker.id = :userId AND b.end < CURRENT_TIMESTAMP")
     List<Booking> findFinishedBookingsByItemAndUser(@Param("itemId") Long itemId, @Param("userId") Long userId);
 }
